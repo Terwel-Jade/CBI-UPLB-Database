@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organization Management System</title>
+    <title>User Profile System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,922 +13,566 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin: 20px 0;
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
         }
 
-        .header {
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1, h2 {
             text-align: center;
+            color: #333;
             margin-bottom: 30px;
         }
 
-        .header h1 {
-            color: #667eea;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-            background: #f8f9fa;
-            border-radius: 50px;
-            padding: 5px;
-        }
-
-        .nav-tab {
-            padding: 12px 24px;
-            margin: 0 5px;
-            background: transparent;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-tab.active {
-            background: #667eea;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .nav-tab:hover:not(.active) {
-            background: #e9ecef;
-        }
-
-        .page {
-            display: none;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
             color: #555;
+            font-weight: 500;
+            font-size: 14px;
         }
 
-        .form-control {
+        input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
         }
 
-        .form-control:focus {
+        input:focus {
             outline: none;
             border-color: #667eea;
+            background: white;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .btn {
-            padding: 12px 24px;
+        input:disabled {
+            background: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .btn-primary:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .btn-secondary {
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
             background: #6c757d;
-            color: white;
+            margin-top: 10px;
         }
 
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 14px;
-        }
-
-        .alert {
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th,
-        .table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .filter-container {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            opacity: 0.9;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .close {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #667eea;
-        }
-
-        .member-detail {
-            margin: 15px 0;
-        }
-
-        .member-detail strong {
-            display: inline-block;
-            min-width: 120px;
-            color: #555;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .nav-tabs {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .nav-tab {
-                margin: 5px 2px;
-                padding: 10px 16px;
-            }
-
-            .filter-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .table {
-                font-size: 14px;
-            }
-
-            .table th,
-            .table td {
-                padding: 8px;
-            }
+        .secondary-btn:hover:not(:disabled) {
+            background: #5a6268;
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
         }
 
         .hidden {
-            display: none !important;
+            display: none;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            color: #155724;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
         }
 
         .loading {
-            text-align: center;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .profile-info {
+            background: #f8f9fa;
             padding: 20px;
-            color: #666;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .profile-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .profile-info p {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .profile-info strong {
+            color: #333;
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Login Page -->
-        <div id="loginPage" class="card">
-            <div class="header">
-                <h1>Organization Management System</h1>
-                <p>Please log in to access the system</p>
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h1>User Profile System</h1>
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your username">
             </div>
-            <div class="login-form">
-                <div id="loginAlert"></div>
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="cryptpadUrl">CryptPad Sheet URL:</label>
-                    <input type="url" id="cryptpadUrl" class="form-control" placeholder="https://cryptpad.fr/sheet/#..." required>
-                </div>
-                <button onclick="login()" class="btn btn-primary" style="width: 100%;">Login</button>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
             </div>
+            <button onclick="login()" id="loginBtn">Login</button>
+            <div class="toggle-link">
+                <a href="#" onclick="showRegister(); return false;">Don't have an account? Register</a>
+            </div>
+            <div id="loginMessage"></div>
         </div>
 
-        <!-- Main Application -->
-        <div id="mainApp" class="hidden">
-            <button onclick="logout()" class="btn btn-secondary logout-btn">Logout</button>
-            
-            <div class="header">
-                <h1>Organization Management System</h1>
+        <!-- Registration Form -->
+        <div id="registerForm" class="hidden">
+            <h1>User Profile System</h1>
+            <h2>Register</h2>
+            <div class="form-group">
+                <label for="regUsername">Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username">
             </div>
-
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
-                <button class="nav-tab" onclick="showPage('addMember')">Add Member</button>
-                <button class="nav-tab" onclick="showPage('membersList')">Members List</button>
+            <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input type="password" id="regPassword" placeholder="Choose a strong password">
             </div>
-
-            <!-- Dashboard Page -->
-            <div id="dashboard" class="page active card">
-                <h2>Dashboard</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalMembers">0</div>
-                        <div class="stat-label">Total Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalBatches">0</div>
-                        <div class="stat-label">Total Batches</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="recentMembers">0</div>
-                        <div class="stat-label">This Month</div>
-                    </div>
-                </div>
-                
-                <div class="alert alert-info">
-                    <h4>System Status</h4>
-                    <p>✅ Database connection: Active</p>
-                    <p>✅ Last sync: <span id="lastSync">Just now</span></p>
-                    <p>✅ All systems operational</p>
-                </div>
-
-                <h3>Recent Activity</h3>
-                <div id="recentActivity">
-                    <p>Welcome to the Organization Management System. Use the navigation tabs above to manage members.</p>
-                </div>
+            <div class="form-group">
+                <label for="regName">Full Name</label>
+                <input type="text" id="regName" placeholder="Enter your full name">
             </div>
-
-            <!-- Add Member Page -->
-            <div id="addMember" class="page card">
-                <h2>Add New Member</h2>
-                <div id="addMemberAlert"></div>
-                <form id="memberForm">
-                    <div class="form-group">
-                        <label for="memberName">Name *</label>
-                        <input type="text" id="memberName" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="studentNo">Student Number *</label>
-                        <input type="text" id="studentNo" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="joinDate">Date Joined *</label>
-                        <input type="date" id="joinDate" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="batch">Batch *</label>
-                        <input type="text" id="batch" class="form-control" placeholder="e.g., 2024-1, Spring 2024" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="tel" id="phone" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" class="form-control" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success">Add Member</button>
-                    <button type="reset" class="btn btn-secondary">Clear Form</button>
-                </form>
+            <div class="form-group">
+                <label for="regIdNumber">ID Number</label>
+                <input type="text" id="regIdNumber" placeholder="Enter your ID number">
             </div>
-
-            <!-- Members List Page -->
-            <div id="membersList" class="page card">
-                <h2>Members List</h2>
-                <div class="filter-container">
-                    <label>Filter by Batch:</label>
-                    <select id="batchFilter" class="form-control" style="width: auto;">
-                        <option value="">All Batches</option>
-                    </select>
-                    <button onclick="refreshMembers()" class="btn btn-info btn-small">Refresh</button>
-                </div>
-                
-                <div id="membersTableContainer">
-                    <div class="loading">Loading members...</div>
-                </div>
+            <div class="form-group">
+                <label for="regBirthday">Birthday</label>
+                <input type="date" id="regBirthday">
             </div>
+            <div class="form-group">
+                <label for="regAddress">Address</label>
+                <input type="text" id="regAddress" placeholder="Enter your address">
+            </div>
+            <button onclick="register()" id="registerBtn">Register</button>
+            <div class="toggle-link">
+                <a href="#" onclick="showLogin(); return false;">Already have an account? Login</a>
+            </div>
+            <div id="registerMessage"></div>
         </div>
 
-        <!-- Member Detail Modal -->
-        <div id="memberModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeMemberModal()">&times;</span>
-                <h2>Member Details</h2>
-                <div id="memberDetails"></div>
-                <div style="margin-top: 20px;">
-                    <button onclick="editMember()" class="btn btn-primary btn-small">Edit</button>
-                    <button onclick="deleteMember()" class="btn btn-danger btn-small">Delete</button>
-                    <button onclick="closeMemberModal()" class="btn btn-secondary btn-small">Close</button>
-                </div>
+        <!-- Profile View -->
+        <div id="profileView" class="hidden">
+            <h1>My Profile</h1>
+            <div class="profile-info">
+                <h3>Profile Information</h3>
+                <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+                <p><strong>Name:</strong> <span id="profileName"></span></p>
+                <p><strong>ID Number:</strong> <span id="profileIdNumber"></span></p>
+                <p><strong>Birthday:</strong> <span id="profileBirthday"></span></p>
+                <p><strong>Address:</strong> <span id="profileAddress"></span></p>
             </div>
+            <button onclick="editProfile()">Edit Profile</button>
+            <button onclick="logout()" class="secondary-btn">Logout</button>
         </div>
 
-        <!-- Edit Member Modal -->
-        <div id="editModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeEditModal()">&times;</span>
-                <h2>Edit Member</h2>
-                <div id="editAlert"></div>
-                <form id="editForm">
-                    <div class="form-group">
-                        <label for="editName">Name *</label>
-                        <input type="text" id="editName" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editStudentNo">Student Number *</label>
-                        <input type="text" id="editStudentNo" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editJoinDate">Date Joined *</label>
-                        <input type="date" id="editJoinDate" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editBatch">Batch *</label>
-                        <input type="text" id="editBatch" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input type="email" id="editEmail" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhone">Phone</label>
-                        <input type="tel" id="editPhone" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="editNotes">Notes</label>
-                        <textarea id="editNotes" class="form-control" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success">Save Changes</button>
-                    <button type="button" onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
-                </form>
+        <!-- Profile Edit -->
+        <div id="profileEdit" class="hidden">
+            <h1>Edit Profile</h1>
+            <div class="form-group">
+                <label for="editName">Full Name</label>
+                <input type="text" id="editName">
             </div>
+            <div class="form-group">
+                <label for="editIdNumber">ID Number</label>
+                <input type="text" id="editIdNumber">
+            </div>
+            <div class="form-group">
+                <label for="editBirthday">Birthday</label>
+                <input type="date" id="editBirthday">
+            </div>
+            <div class="form-group">
+                <label for="editAddress">Address</label>
+                <input type="text" id="editAddress">
+            </div>
+            <div class="form-group">
+                <label for="editPassword">New Password (leave blank to keep current)</label>
+                <input type="password" id="editPassword" placeholder="Enter new password">
+            </div>
+            <button onclick="saveProfile()" id="saveBtn">Save Changes</button>
+            <button onclick="cancelEdit()" class="secondary-btn">Cancel</button>
+            <div id="editMessage"></div>
         </div>
     </div>
 
     <script>
-        // Global variables
+        // IMPORTANT: Replace this with your Google Apps Script Web App URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyI-Zw3_8v7NfQhUlPuCIl8ETsi9FWZB148weuiSBYb5W34ei_GAbavbAhFbrskbCrYZQ/exec';
+        
         let currentUser = null;
-        let cryptpadUrl = '';
-        let membersData = [];
-        let currentEditingMember = null;
 
-        // Authentication functions
+        // Encryption functions
+        const SECRET_KEY = 'xK9#mP2$vN5@qR8&jL4*wE7!zT6%bY3^hU1!nG8@oA5#';
+
+        function encrypt(text) {
+            return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
+        }
+
+        function decrypt(ciphertext) {
+            const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        }
+
+        function hashPassword(password) {
+            return CryptoJS.SHA256(password).toString();
+        }
+
+        // UI Functions
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('profileEdit').classList.add('hidden');
+            clearMessages();
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('profileEdit').classList.add('hidden');
+            clearMessages();
+        }
+
+        function showProfile() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('profileView').classList.remove('hidden');
+            document.getElementById('profileEdit').classList.add('hidden');
+            clearMessages();
+        }
+
+        function editProfile() {
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('profileEdit').classList.remove('hidden');
+            
+            // Populate edit form with current data
+            document.getElementById('editName').value = currentUser.name;
+            document.getElementById('editIdNumber').value = currentUser.idNumber;
+            document.getElementById('editBirthday').value = currentUser.birthday;
+            document.getElementById('editAddress').value = currentUser.address;
+            document.getElementById('editPassword').value = '';
+        }
+
+        function cancelEdit() {
+            showProfile();
+        }
+
+        function clearMessages() {
+            document.getElementById('loginMessage').innerHTML = '';
+            document.getElementById('registerMessage').innerHTML = '';
+            document.getElementById('editMessage').innerHTML = '';
+        }
+
+        function showMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${isError ? 'error' : 'success'}">${message}</div>`;
+        }
+
+        function setLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = '<span class="loading"></span>';
+            } else {
+                button.disabled = false;
+                if (buttonId === 'loginBtn') button.innerHTML = 'Login';
+                else if (buttonId === 'registerBtn') button.innerHTML = 'Register';
+                else if (buttonId === 'saveBtn') button.innerHTML = 'Save Changes';
+            }
+        }
+
+        // API Functions
         async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const url = document.getElementById('cryptpadUrl').value;
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
 
-            if (!username || !password || !url) {
-                showAlert('loginAlert', 'Please fill in all fields.', 'error');
+            if (!username || !password) {
+                showMessage('loginMessage', 'Please enter both username and password', true);
                 return;
             }
 
+            setLoading('loginBtn', true);
+
             try {
-                showAlert('loginAlert', 'Connecting to CryptPad...', 'info');
-                
-                // For demo purposes, we'll accept any credentials
-                // In a real implementation, you would verify against AdminUser sheet
-                if (username && password) {
-                    currentUser = username;
-                    cryptpadUrl = url;
-                    
-                    document.getElementById('loginPage').classList.add('hidden');
-                    document.getElementById('mainApp').classList.remove('hidden');
-                    
-                    await loadDashboardData();
-                    showAlert('loginAlert', '', ''); // Clear alert
+                const response = await fetch(`${API_URL}?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: encrypt(username),
+                        password: hashPassword(password)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    displayProfile();
+                    showProfile();
                 } else {
-                    showAlert('loginAlert', 'Invalid credentials. Please try again.', 'error');
+                    showMessage('loginMessage', data.message || 'Invalid credentials', true);
                 }
             } catch (error) {
-                showAlert('loginAlert', 'Connection failed. Please check your CryptPad URL and try again.', 'error');
+                showMessage('loginMessage', 'Connection error. Please try again.', true);
+            } finally {
+                setLoading('loginBtn', false);
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const name = document.getElementById('regName').value.trim();
+            const idNumber = document.getElementById('regIdNumber').value.trim();
+            const birthday = document.getElementById('regBirthday').value;
+            const address = document.getElementById('regAddress').value.trim();
+
+            if (!username || !password || !name || !idNumber || !birthday || !address) {
+                showMessage('registerMessage', 'Please fill in all fields', true);
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('registerMessage', 'Password must be at least 6 characters', true);
+                return;
+            }
+
+            setLoading('registerBtn', true);
+
+            try {
+                const response = await fetch(`${API_URL}?action=register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: encrypt(username),
+                        password: hashPassword(password),
+                        name: encrypt(name),
+                        idNumber: encrypt(idNumber),
+                        birthday: encrypt(birthday),
+                        address: encrypt(address)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('registerMessage', 'Registration successful! Please login.', false);
+                    setTimeout(() => showLogin(), 2000);
+                } else {
+                    showMessage('registerMessage', data.message || 'Registration failed', true);
+                }
+            } catch (error) {
+                showMessage('registerMessage', 'Connection error. Please try again.', true);
+            } finally {
+                setLoading('registerBtn', false);
+            }
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('editName').value.trim();
+            const idNumber = document.getElementById('editIdNumber').value.trim();
+            const birthday = document.getElementById('editBirthday').value;
+            const address = document.getElementById('editAddress').value.trim();
+            const newPassword = document.getElementById('editPassword').value;
+
+            if (!name || !idNumber || !birthday || !address) {
+                showMessage('editMessage', 'Please fill in all required fields', true);
+                return;
+            }
+
+            setLoading('saveBtn', true);
+
+            try {
+                const updateData = {
+                    username: currentUser.username,
+                    name: encrypt(name),
+                    idNumber: encrypt(idNumber),
+                    birthday: encrypt(birthday),
+                    address: encrypt(address)
+                };
+
+                if (newPassword) {
+                    if (newPassword.length < 6) {
+                        showMessage('editMessage', 'Password must be at least 6 characters', true);
+                        setLoading('saveBtn', false);
+                        return;
+                    }
+                    updateData.password = hashPassword(newPassword);
+                }
+
+                const response = await fetch(`${API_URL}?action=update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    displayProfile();
+                    showMessage('editMessage', 'Profile updated successfully!', false);
+                    setTimeout(() => showProfile(), 1500);
+                } else {
+                    showMessage('editMessage', data.message || 'Update failed', true);
+                }
+            } catch (error) {
+                showMessage('editMessage', 'Connection error. Please try again.', true);
+            } finally {
+                setLoading('saveBtn', false);
+            }
+        }
+
+        function displayProfile() {
+            if (currentUser) {
+                document.getElementById('profileUsername').textContent = currentUser.username;
+                document.getElementById('profileName').textContent = currentUser.name;
+                document.getElementById('profileIdNumber').textContent = currentUser.idNumber;
+                document.getElementById('profileBirthday').textContent = currentUser.birthday;
+                document.getElementById('profileAddress').textContent = currentUser.address;
             }
         }
 
         function logout() {
             currentUser = null;
-            cryptpadUrl = '';
-            membersData = [];
-            
-            // Clear forms
-            document.getElementById('memberForm').reset();
-            document.querySelectorAll('input').forEach(input => {
-                if (input.type !== 'button' && input.type !== 'submit') input.value = '';
-            });
-            
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('loginPage').classList.remove('hidden');
-            showPage('dashboard');
+            sessionStorage.removeItem('currentUser');
+            showLogin();
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
         }
 
-        // Navigation functions
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            
-            // Add active class to clicked tab
-            event.target.classList.add('active');
-            
-            // Load page-specific data
-            if (pageId === 'membersList') {
-                loadMembers();
-            } else if (pageId === 'dashboard') {
-                loadDashboardData();
+        // Check for existing session on page load
+        window.addEventListener('load', () => {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                displayProfile();
+                showProfile();
             }
-        }
-
-        // Dashboard functions
-        async function loadDashboardData() {
-            try {
-                // Simulate loading data from CryptPad
-                // In a real implementation, you would fetch from your CryptPad sheet
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Update stats (using demo data)
-                document.getElementById('totalMembers').textContent = membersData.length;
-                document.getElementById('totalBatches').textContent = new Set(membersData.map(m => m.batch)).size;
-                
-                const thisMonth = new Date().getMonth();
-                const recentCount = membersData.filter(m => new Date(m.joinDate).getMonth() === thisMonth).length;
-                document.getElementById('recentMembers').textContent = recentCount;
-                
-                document.getElementById('lastSync').textContent = new Date().toLocaleString();
-                
-                // Update recent activity
-                const recentActivity = document.getElementById('recentActivity');
-                if (membersData.length > 0) {
-                    const recent = membersData.slice(-3).reverse();
-                    recentActivity.innerHTML = '<h4>Recently Added Members:</h4>' + 
-                        recent.map(m => `<p>• ${m.name} (${m.studentNo}) - ${m.batch}</p>`).join('');
-                }
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
-        }
-
-        // Member management functions
-        document.getElementById('memberForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                id: Date.now().toString(),
-                name: document.getElementById('memberName').value,
-                studentNo: document.getElementById('studentNo').value,
-                joinDate: document.getElementById('joinDate').value,
-                batch: document.getElementById('batch').value,
-                email: document.getElementById('email').value || '',
-                phone: document.getElementById('phone').value || '',
-                notes: document.getElementById('notes').value || '',
-                dateAdded: new Date().toISOString()
-            };
-            
-            try {
-                // In a real implementation, you would append to your CryptPad sheet
-                membersData.push(formData);
-                
-                showAlert('addMemberAlert', 'Member added successfully!', 'success');
-                document.getElementById('memberForm').reset();
-                
-                // Update dashboard if it's visible
-                if (document.getElementById('dashboard').classList.contains('active')) {
-                    await loadDashboardData();
-                }
-                
-            } catch (error) {
-                showAlert('addMemberAlert', 'Error adding member. Please try again.', 'error');
-            }
-        });
-
-        async function loadMembers() {
-            const container = document.getElementById('membersTableContainer');
-            container.innerHTML = '<div class="loading">Loading members...</div>';
-            
-            try {
-                // Simulate loading from CryptPad
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Update batch filter
-                updateBatchFilter();
-                
-                // Display members table
-                displayMembersTable();
-                
-            } catch (error) {
-                container.innerHTML = '<div class="alert alert-error">Error loading members. Please try again.</div>';
-            }
-        }
-
-        function updateBatchFilter() {
-            const select = document.getElementById('batchFilter');
-            const currentValue = select.value;
-            
-            // Clear existing options except "All Batches"
-            select.innerHTML = '<option value="">All Batches</option>';
-            
-            // Add unique batches
-            const batches = [...new Set(membersData.map(m => m.batch))].sort();
-            batches.forEach(batch => {
-                const option = document.createElement('option');
-                option.value = batch;
-                option.textContent = batch;
-                if (batch === currentValue) option.selected = true;
-                select.appendChild(option);
-            });
-        }
-
-        function displayMembersTable() {
-            const container = document.getElementById('membersTableContainer');
-            const filterValue = document.getElementById('batchFilter').value;
-            
-            let filteredMembers = membersData;
-            if (filterValue) {
-                filteredMembers = membersData.filter(m => m.batch === filterValue);
-            }
-            
-            if (filteredMembers.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">No members found.</div>';
-                return;
-            }
-            
-            const table = `
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Student No.</th>
-                            <th>Batch</th>
-                            <th>Date Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredMembers.map(member => `
-                            <tr>
-                                <td>${member.name}</td>
-                                <td>${member.studentNo}</td>
-                                <td>${member.batch}</td>
-                                <td>${new Date(member.joinDate).toLocaleDateString()}</td>
-                                <td>
-                                    <button onclick="viewMember('${member.id}')" class="btn btn-info btn-small">View</button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-            
-            container.innerHTML = table;
-        }
-
-        // Filter functionality
-        document.getElementById('batchFilter').addEventListener('change', displayMembersTable);
-
-        function refreshMembers() {
-            loadMembers();
-        }
-
-        // Modal functions
-        function viewMember(memberId) {
-            const member = membersData.find(m => m.id === memberId);
-            if (!member) return;
-            
-            const details = `
-                <div class="member-detail"><strong>Name:</strong> ${member.name}</div>
-                <div class="member-detail"><strong>Student No:</strong> ${member.studentNo}</div>
-                <div class="member-detail"><strong>Batch:</strong> ${member.batch}</div>
-                <div class="member-detail"><strong>Date Joined:</strong> ${new Date(member.joinDate).toLocaleDateString()}</div>
-                <div class="member-detail"><strong>Email:</strong> ${member.email || 'N/A'}</div>
-                <div class="member-detail"><strong>Phone:</strong> ${member.phone || 'N/A'}</div>
-                <div class="member-detail"><strong>Notes:</strong> ${member.notes || 'N/A'}</div>
-                <div class="member-detail"><strong>Date Added:</strong> ${new Date(member.dateAdded).toLocaleDateString()}</div>
-            `;
-            
-            document.getElementById('memberDetails').innerHTML = details;
-            currentEditingMember = member;
-            document.getElementById('memberModal').style.display = 'block';
-        }
-
-        function closeMemberModal() {
-            document.getElementById('memberModal').style.display = 'none';
-            currentEditingMember = null;
-        }
-
-        function editMember() {
-            if (!currentEditingMember) return;
-            
-            // Populate edit form
-            document.getElementById('editName').value = currentEditingMember.name;
-            document.getElementById('editStudentNo').value = currentEditingMember.studentNo;
-            document.getElementById('editJoinDate').value = currentEditingMember.joinDate;
-            document.getElementById('editBatch').value = currentEditingMember.batch;
-            document.getElementById('editEmail').value = currentEditingMember.email || '';
-            document.getElementById('editPhone').value = currentEditingMember.phone || '';
-            document.getElementById('editNotes').value = currentEditingMember.notes || '';
-            
-            closeMemberModal();
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            document.getElementById('editAlert').innerHTML = '';
-        }
-
-        document.getElementById('editForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!currentEditingMember) return;
-            
-            // Update member data
-            const index = membersData.findIndex(m => m.id === currentEditingMember.id);
-            if (index !== -1) {
-                membersData[index] = {
-                    ...membersData[index],
-                    name: document.getElementById('editName').value,
-                    studentNo: document.getElementById('editStudentNo').value,
-                    joinDate: document.getElementById('editJoinDate').value,
-                    batch: document.getElementById('editBatch').value,
-                    email: document.getElementById('editEmail').value,
-                    phone: document.getElementById('editPhone').value,
-                    notes: document.getElementById('editNotes').value
-                };
-                
-                showAlert('editAlert', 'Member updated successfully!', 'success');
-                setTimeout(() => {
-                    closeEditModal();
-                    displayMembersTable();
-                }, 1500);
-            }
-        });
-
-        function deleteMember() {
-            if (!currentEditingMember) return;
-            
-            if (confirm(`Are you sure you want to delete ${currentEditingMember.name}?`)) {
-                const index = membersData.findIndex(m => m.id === currentEditingMember.id);
-                if (index !== -1) {
-                    membersData.splice(index, 1);
-                    closeMemberModal();
-                    displayMembersTable();
-                    loadDashboardData();
-                }
-            }
-        }
-
-        // Utility functions
-        function showAlert(containerId, message, type) {
-            const container = document.getElementById(containerId);
-            if (!message) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            const alertClass = type === 'error' ? 'alert-error' : 
-                             type === 'success' ? 'alert-success' : 'alert-info';
-            
-            container.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
-            
-            // Auto-hide success messages
-            if (type === 'success') {
-                setTimeout(() => {
-                    container.innerHTML = '';
-                }, 3000);
-            }
-        }
-
-        // Close modals when clicking outside
-        window.onclick = function(event) {
-            const memberModal = document.getElementById('memberModal');
-            const editModal = document.getElementById('editModal');
-            
-            if (event.target === memberModal) {
-                closeMemberModal();
-            } else if (event.target === editModal) {
-                closeEditModal();
-            }
-        }
-
-        // Initialize with demo data
-        membersData = [
-            {
-                id: '1',
-                name: 'John Doe',
-                studentNo: 'ST2024001',
-                joinDate: '2024-01-15',
-                batch: '2024-1',
-                email: 'john.doe@email.com',
-                phone: '+1234567890',
-                notes: 'Active member, good participation',
-                dateAdded: '2024-01-15T10:00:00Z'
-            },
-            {
-                id: '2',
-                name: 'Jane Smith',
-                studentNo: 'ST2024002',
-                joinDate: '2024-02-01',
-                batch: '2024-1',
-                email: 'jane.smith@email.com',
-                phone: '+1234567891',
-                notes: 'Vice President, excellent leadership',
-                dateAdded: '2024-02-01T10:00:00Z'
-            },
-            {
-                id: '3',
-                name: 'Mike Johnson',
-                studentNo: 'ST2024003',
-                joinDate: '2024-03-10',
-                batch: '2024-2',
-                email: 'mike.johnson@email.com',
-                phone: '+1234567892',
-                notes: 'Treasurer, handles finances',
-                dateAdded: '2024-03-10T10:00:00Z'
-            },
-            {
-                id: '4',
-                name: 'Sarah Wilson',
-                studentNo: 'ST2024004',
-                joinDate: '2024-08-15',
-                batch: '2024-3',
-                email: 'sarah.wilson@email.com',
-                phone: '+1234567893',
-                notes: 'New member, very enthusiastic',
-                dateAdded: '2024-08-15T10:00:00Z'
-            }
-        ];
-
-        // Auto-fill today's date when adding new member
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('joinDate').value = today;
         });
     </script>
 </body>
